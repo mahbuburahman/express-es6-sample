@@ -3,16 +3,38 @@ version: 0.2
 phases:
   install:
     commands:
-      - npm ci
+      - npm ci || npm install
   build:
     commands:
       - npm run build
-      - 'printf "web: npm start\n" > Procfile'
-
 artifacts:
   files:
     - package.json
     - package-lock.json
+    - dist-server//* 
+    - public//* 
+    - buildspec-test.yml 
     - Procfile
-    - dist-server/**/*
   discard-paths: no
+
+
+
+# version: 0.2
+
+# phases:
+#   install:
+#     commands:
+#       - npm ci
+#   build:
+#     commands:
+#       - npm run build
+#       - 'printf "web: npm start\n" > Procfile'
+
+# artifacts:
+#   files:
+#     - package.json
+#     - package-lock.json
+#     - Procfile
+#     - dist-server/**/*
+#   discard-paths: no
+
