@@ -3,19 +3,46 @@ version: 0.2
 phases:
   install:
     commands:
-      - npm ci || npm install
+      # Use npm ci for clean, reproducible installations based on package-lock.json
+      - echo "Installing dependencies using npm ci..."
+      - npm ci
   build:
     commands:
+      # The 'build' script runs 'clean' and 'transpile', creating the 'dist-server' directory
+      - echo "Running application build (transpilation)..."
       - npm run build
+
+# Note on Testing: This buildspec prepares artifacts after the build.
+# The actual 'Test' step (Stage 3) should be a separate CodeBuild action 
+# configured in your AWS CodePipeline using the buildspec-test.yml.
+
 artifacts:
   files:
-    - package.json
-    - package-lock.json
-    - dist-server//* 
-    - public//* 
-    - buildspec-test.yml 
-    - Procfile
+    # --- CRITICAL ARTIFACTS FOR ELASTIC BEANSTALK DEPLOYMENT ---
+    
+    # 1. Include ALL files recursively within the compiled directory. 
+    # This is necessary for the 'node ./dist-server/bin/www' command to work.
+    - 'dist-server/**/*' 
+    
+    # 2. Include ALL installed Node modules. Elastic Beanstalk needs these to start.
+    - 'node_modules/**/*'
+    
+    # 3. Include necessary configuration and root files
+    - 'package.json'
+    - 'package-lock.json'
+    - 'Procfile'
+    
+    # 4. Include the dedicated buildspec for the testing stage
+    - 'buildspec-test.yml' 
+    
+    # 5. Include the public assets folder
+    - 'public/**/*' 
+
   discard-paths: no
+
+
+
+
 
 
 
@@ -24,17 +51,38 @@ artifacts:
 # phases:
 #   install:
 #     commands:
-#       - npm ci
+#       - npm ci || npm install
 #   build:
 #     commands:
 #       - npm run build
-#       - 'printf "web: npm start\n" > Procfile'
-
 # artifacts:
 #   files:
 #     - package.json
 #     - package-lock.json
+#     - dist-server//* 
+#     - public//* 
+#     - buildspec-test.yml 
 #     - Procfile
-#     - dist-server/**/*
 #   discard-paths: no
+
+
+
+# # version: 0.2
+
+# # phases:
+# #   install:
+# #     commands:
+# #       - npm ci
+# #   build:
+# #     commands:
+# #       - npm run build
+# #       - 'printf "web: npm start\n" > Procfile'
+
+# # artifacts:
+# #   files:
+# #     - package.json
+# #     - package-lock.json
+# #     - Procfile
+# #     - dist-server/**/*
+# #   discard-paths: no
 
