@@ -3,39 +3,28 @@ version: 0.2
 phases:
   install:
     commands:
-      # Use npm ci for clean, reproducible installations based on package-lock.json
+
       - echo "Installing dependencies using npm ci..."
       - npm ci
   build:
     commands:
-      # The 'build' script runs 'clean' and 'transpile', creating the 'dist-server' directory
+   
       - echo "Running application build (transpilation)..."
       - npm run build
 
-# Note on Testing: This buildspec prepares artifacts after the build.
-# The actual 'Test' step (Stage 3) should be a separate CodeBuild action 
-# configured in your AWS CodePipeline using the buildspec-test.yml.
+
 
 artifacts:
   files:
-    # --- CRITICAL ARTIFACTS FOR ELASTIC BEANSTALK DEPLOYMENT ---
-    
-    # 1. Include ALL files recursively within the compiled directory. 
-    # This is necessary for the 'node ./dist-server/bin/www' command to work.
     - 'dist-server/**/*' 
-    
-    # 2. Include ALL installed Node modules. Elastic Beanstalk needs these to start.
+  
     - 'node_modules/**/*'
-    
-    # 3. Include necessary configuration and root files
+
     - 'package.json'
     - 'package-lock.json'
     - 'Procfile'
-    
-    # 4. Include the dedicated buildspec for the testing stage
+ 
     - 'buildspec-test.yml' 
-    
-    # 5. Include the public assets folder
     - 'public/**/*' 
 
   discard-paths: no
